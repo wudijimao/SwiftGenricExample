@@ -10,11 +10,11 @@ import UIKit
 private var UIControlEventHandlerKey = "UIControlEventHandlerKey"
 
 
-public class UIControlEventWrapper: NSObject {
+public class UIControlEventWrapper<ControlType: UIControl>: NSObject {
     
-    private var _handler: (UIControl) -> Void
+    private var _handler: (ControlType) -> Void
     
-    public init(_ control: UIControl, event: UIControl.Event, handler: @escaping (UIControl) -> Void) {
+    public init(_ control: ControlType, event: UIControl.Event, handler: @escaping (ControlType) -> Void) {
         self._handler = handler
         super.init()
         control.addTarget(self, action: #selector(invoke(_:)), for: event)
@@ -22,11 +22,15 @@ public class UIControlEventWrapper: NSObject {
     }
     
     @objc private func invoke(_ control: UIControl) {
-        self._handler(control)
+        self._handler(control as! ControlType)
     }
 }
 
-public extension UIControl {
+public protocol UIControlEventProtocol {}
+
+extension UIControl: UIControlEventProtocol {}
+
+public extension UIControlEventProtocol where Self: UIControl {
     
     fileprivate func appendWrapper(_ holder: NSObject) {
         var holders = (objc_getAssociatedObject(self, &UIControlEventHandlerKey) as? [NSObject]) ?? []
@@ -34,8 +38,8 @@ public extension UIControl {
         objc_setAssociatedObject(self, &UIControlEventHandlerKey, holders, .OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
-    public func on(_ event: UIControl.Event, _ handler: @escaping (UIControl)-> Void) {
-        let eventWrapper = UIControlEventWrapper.init(self, event: event, handler: handler)
+    public func on(_ event: UIControl.Event, _ handler: @escaping (Self)-> Void) {
+        let eventWrapper = UIControlEventWrapper<Self>.init(self, event: event, handler: handler)
         self.appendWrapper(eventWrapper)
     }
 }
@@ -43,7 +47,7 @@ public extension UIControl {
 
 class ViewController: UIViewController {
     
-    let testButton = UIButton(frame: CGRect(x: 200, y: 100, width: 100, height: 100))
+    let testButton = UIButton(frame: CGRect(x: 100, y: 100, width: 200, height: 100))
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,9 +55,11 @@ class ViewController: UIViewController {
         testButton.setTitle("测试按钮", for: .normal)
         testButton.backgroundColor = UIColor.red
         var count = 0
-        testButton.on(.touchUpInside) { (_) in
+        testButton.on(.touchUpInside) { (btn) in
             count += 1
-            print("按钮被点击\(count)次")
+            let str = "按钮被点击\(count)次"
+            print(str)
+            btn.setTitle(str, for: .normal)
         }
     }
 
