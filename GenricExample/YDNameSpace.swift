@@ -8,17 +8,21 @@
 
 import UIKit
 
+public protocol YDNameSpaceProtocal {}
 
-
-class YDNamespace<T> {
-    var base: T
-    init(_ base: T) {
+class YDNamespace<Base> {
+    var base: Base
+    init(_ base: Base) {
         self.base = base
     }
 }
 
-extension UIControl {
-    var yd: YDNamespace<UIControl> {
+extension YDNameSpaceProtocal {
+    var yd: YDNamespace<Self> {
         return YDNamespace(self)
     }
 }
+
+
+
+extension UIControl: YDNameSpaceProtocal {}

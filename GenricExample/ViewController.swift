@@ -26,21 +26,17 @@ public class UIControlEventWrapper<ControlType: UIControl>: NSObject {
     }
 }
 
-public protocol UIControlEventProtocol {}
 
-extension UIControl: UIControlEventProtocol {}
-
-
-public extension UIControlEventProtocol where Self: UIControl {
+extension YDNamespace where Base: UIControl {
     
     fileprivate func appendWrapper(_ holder: NSObject) {
-        var holders = (objc_getAssociatedObject(self, &UIControlEventHandlerKey) as? [NSObject]) ?? []
+        var holders = (objc_getAssociatedObject(base, &UIControlEventHandlerKey) as? [NSObject]) ?? []
         holders.append(holder)
-        objc_setAssociatedObject(self, &UIControlEventHandlerKey, holders, .OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(base, &UIControlEventHandlerKey, holders, .OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
-    public func on(_ event: UIControl.Event, _ handler: @escaping (Self)-> Void) {
-        let eventWrapper = UIControlEventWrapper<Self>.init(self, event: event, handler: handler)
+    func on(_ event: UIControl.Event, _ handler: @escaping (Base)-> Void) {
+        let eventWrapper = UIControlEventWrapper<Base>.init(base, event: event, handler: handler)
         self.appendWrapper(eventWrapper)
     }
 }
@@ -56,12 +52,14 @@ class ViewController: UIViewController {
         testButton.setTitle("测试按钮", for: .normal)
         testButton.backgroundColor = UIColor.red
         var count = 0
-        testButton.on(.touchUpInside) { (btn) in
+        testButton.yd.on(.touchUpInside) { (btn) in
             count += 1
             let str = "按钮被点击\(count)次"
             print(str)
             btn.setTitle(str, for: .normal)
         }
+        
+        
     }
 
 }
