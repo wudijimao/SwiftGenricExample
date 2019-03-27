@@ -26,23 +26,10 @@ public class UIControlEventWrapper<ControlType: UIControl>: NSObject {
     }
 }
 
-class YDWrapper {
-
-    func testNamespace(){
-        print("namespace test")
-    }
-}
-
-
 public protocol UIControlEventProtocol {}
 
 extension UIControl: UIControlEventProtocol {}
 
-extension UIControl {
-    var yd: YDWrapper {
-        return YDWrapper()
-    }
-}
 
 public extension UIControlEventProtocol where Self: UIControl {
     
