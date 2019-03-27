@@ -10,19 +10,15 @@ import UIKit
 
 
 
-class YDNamespace {
-    var control: UIControl
-    init(_ control: UIControl) {
-        self.control = control
-    }
-    func testNamespace(){
-        print("namespace test")
-        print("\(control)")
+class YDNamespace<T> {
+    var base: T
+    init(_ base: T) {
+        self.base = base
     }
 }
 
 extension UIControl {
-    var yd: YDNamespace {
+    var yd: YDNamespace<UIControl> {
         return YDNamespace(self)
     }
 }

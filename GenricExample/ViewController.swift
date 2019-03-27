@@ -62,8 +62,6 @@ class ViewController: UIViewController {
             print(str)
             btn.setTitle(str, for: .normal)
         }
-        
-        testButton.yd.testNamespace()
     }
 
 }
